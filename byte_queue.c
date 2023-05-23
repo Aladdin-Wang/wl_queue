@@ -63,8 +63,9 @@ int16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
        0 != this.hwLength ) {
         return 0;
     }
-    uint8_t *pchByte = pDate;
     queue_protect() {
+        uint8_t *pchByte = pDate;
+
         if(hwLength > (this.hwSize - this.hwLength)) {
             hwLength = this.hwSize - this.hwLength;
         }
@@ -242,8 +243,9 @@ int16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
        0 == this.hwPeekLength ) {
         return 0;
     }
-    uint8_t *pchByte = pDate;
+
     queue_protect() {
+        uint8_t *pchByte = pDate;
         if(hwLength > this.hwPeekLength) {
             hwLength = this.hwPeekLength;
         }

@@ -73,7 +73,7 @@
 #endif
 
 #define __DEQUEUE_0( __QUEUE, __ADDR)                                \
-            dequeue_bytes((__QUEUE), __ADDR,(sizeof(typeof(*(__ADDR)))))
+            dequeue_bytes((__QUEUE), (__ADDR),(sizeof(typeof(*(__ADDR)))))
 
 #define __DEQUEUE_1( __QUEUE, __ADDR, __ITEM_COUNT)                        \
             dequeue_bytes((__QUEUE), (__ADDR), __ITEM_COUNT*(sizeof(typeof((__ADDR[0])))))
@@ -83,8 +83,8 @@
 
 
 #define __ENQUEUE_0__( __QUEUE, __VALUE)                                     \
-            do{typeof((__VALUE)) SAFE_NAME(value) = __VALUE;                     \
-            enqueue_bytes((__QUEUE), &(SAFE_NAME(value)), (sizeof(__VALUE)));}while(0)
+            ({typeof((__VALUE)) SAFE_NAME(value) = __VALUE;                     \
+            enqueue_bytes((__QUEUE), &(SAFE_NAME(value)), (sizeof(__VALUE)));})
 
 #define __ENQUEUE_0( __QUEUE, __VALUE)                                     \
             __ENQUEUE_0__( __QUEUE, __VALUE)
@@ -111,15 +111,15 @@
 
 #define DEQUEUE(__QUEUE, __ADDR,...)                                            \
             __PLOOC_EVAL(__DEQUEUE_,##__VA_ARGS__)                              \
-                (__QUEUE,__ADDR,##__VA_ARGS__)                 
+                (__QUEUE,(__ADDR),##__VA_ARGS__)                 
 
 #define ENQUEUE(__QUEUE, __ADDR,...)                                            \
             __PLOOC_EVAL(__ENQUEUE_,##__VA_ARGS__)                              \
-                (__QUEUE,__ADDR,##__VA_ARGS__) 
+                (__QUEUE,(__ADDR),##__VA_ARGS__) 
 
 #define PEEK_QUEUE(__QUEUE, __ADDR,...)                                         \
             __PLOOC_EVAL(__PEEK_QUEUE_,##__VA_ARGS__)                           \
-                (__QUEUE,__ADDR,##__VA_ARGS__) 
+                (__QUEUE,(__ADDR),##__VA_ARGS__) 
 
 #define IS_ENQUEUE_EMPTY(__QUEUE)                                               \
             is_byte_queue_empty(__QUEUE)
