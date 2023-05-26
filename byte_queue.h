@@ -6,27 +6,6 @@
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
-/* example:
-
-    ENQUEUE(&my_queue,data1);//根据变量的类型，自动计算对象的大小
-    ENQUEUE(&my_queue,data2);
-    ENQUEUE(&my_queue,data3);
-
-    // 一下三种方式都可以正确存储数组
-    ENQUEUE(&my_queue,data4,2);//可以不指名数据类型
-    ENQUEUE(&my_queue,data4,uint16_t,2);//也可以指名数据类型
-    ENQUEUE(&my_queue,data4,uint8_t,sizeof(data4));//或者用其他类型
-
-    //一下两种方式都可以正确存储结构体类型
-    ENQUEUE(&my_queue,data5);//根据结构体的类型，自动计算对象的大小
-    ENQUEUE(&my_queue,&data5,uint8_t,sizeof(data5));//也可以以数组方式存储
-
-
-    // 读出全部数据
-    DEQUEUE(&my_queue,data,GET_QUEUE_COUNT(&my_queue));
-  //DEQUEUE(&my_queue,data,uint8_t,GET_QUEUE_COUNT(&my_queue))
-
-*/
 
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
 
