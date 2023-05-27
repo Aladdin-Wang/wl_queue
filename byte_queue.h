@@ -206,13 +206,13 @@ extern
 bool enqueue_byte(byte_queue_t *ptQueue, uint8_t chByte);
 
 extern
-int16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength);
+uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength);
 
 extern
 bool dequeue_byte(byte_queue_t *ptQueue, uint8_t *pchByte);
 
 extern
-int16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength);
+uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength);
 
 extern
 bool is_queue_empty(byte_queue_t *ptQueue);
@@ -221,7 +221,7 @@ extern
 bool peek_byte_queue(byte_queue_t *ptQueue, uint8_t *pchByte);
 
 extern
-int16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength);
+uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength);
 
 extern
 bool reset_peek(byte_queue_t *ptQueue);
@@ -236,10 +236,10 @@ extern
 bool restore_peek_status(byte_queue_t *ptQueue, uint16_t hwCount);
 
 extern
-int16_t get_queue_count(byte_queue_t *ptObj);
+uint16_t get_queue_count(byte_queue_t *ptObj);
 
 extern
-int16_t get_queue_available_count(byte_queue_t *ptObj);
+uint16_t get_queue_available_count(byte_queue_t *ptObj);
 
 #undef __BYTE_QUEUE_CLASS_INHERIT__
 #undef __BYTE_QUEUE_CLASS_IMPLEMENT__

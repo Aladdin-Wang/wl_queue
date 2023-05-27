@@ -66,7 +66,7 @@ bool enqueue_byte(byte_queue_t *ptObj, uint8_t chByte)
     return bResult;
 }
 
-int16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
+uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
 {
     assert(NULL != ptObj);
     /* initialise "this" (i.e. ptThis) to access class members */
@@ -136,7 +136,7 @@ bool dequeue_byte(byte_queue_t *ptObj, uint8_t *pchByte)
     return bResult;
 }
 
-int16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
+uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
 {
     assert(NULL != ptObj);
 
@@ -195,7 +195,7 @@ bool is_queue_empty(byte_queue_t *ptObj)
     return false;
 }
 
-int16_t get_queue_count(byte_queue_t *ptObj)
+uint16_t get_queue_count(byte_queue_t *ptObj)
 {
     assert(NULL != ptObj);
     /* initialise "this" (i.e. ptThis) to access class members */
@@ -204,7 +204,7 @@ int16_t get_queue_count(byte_queue_t *ptObj)
     return (this.hwLength);
 }
 
-int16_t get_queue_available_count(byte_queue_t *ptObj)
+uint16_t get_queue_available_count(byte_queue_t *ptObj)
 {
     assert(NULL != ptObj);
     /* initialise "this" (i.e. ptThis) to access class members */
@@ -258,7 +258,7 @@ bool peek_byte_queue(byte_queue_t *ptObj, uint8_t *pchByte)
     return bResult;
 }
 
-int16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
+uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
 {
     assert(NULL != ptObj);
 
