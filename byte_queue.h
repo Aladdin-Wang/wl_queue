@@ -78,6 +78,7 @@
 #define QUEUE_INIT(__QUEUE, __BUFFER, __SIZE )               \
     queue_init_byte(__QUEUE, __BUFFER, __SIZE )
 
+
 /*!
  * \brief Get data from the ring buffer.
  *
@@ -111,6 +112,8 @@
 #define DEQUEUE(__QUEUE, __ADDR,...)                                            \
     __PLOOC_EVAL(__DEQUEUE_,##__VA_ARGS__)                              \
     (__QUEUE,(__ADDR),##__VA_ARGS__)
+
+
 /*!
  * \brief Put a block of data into the ring buffer. If the capacity of ring buffer is insufficient, it will discard out-of-range data.
  *
@@ -191,6 +194,7 @@ def_class(byte_queue_t,
           )
          )
 end_def_class(byte_queue_t)
+
 
 extern
 byte_queue_t * queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwItemSize);
