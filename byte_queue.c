@@ -1,3 +1,20 @@
+/****************************************************************************
+*  Copyright 2022 KK                                                        *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 #define __BYTE_QUEUE_CLASS_IMPLEMENT__
 #include "byte_queue.h"
 
@@ -5,7 +22,7 @@
 #undef this
 #define this        (*ptThis)
 
-byte_queue_t * queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwItemSize)
+byte_queue_t * queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwItemSize,bool bIsCover)
 {
     assert(NULL != ptObj);
     /* initialise "this" (i.e. ptThis) to access class members */
@@ -23,6 +40,7 @@ byte_queue_t * queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwIt
         this.hwLength = 0;
         this.hwPeek = this.hwHead;
         this.hwPeekLength = 0;
+        this.bIsCover = bIsCover;
     }
     return ptObj;
 }
@@ -52,8 +70,19 @@ bool enqueue_byte(byte_queue_t *ptObj, uint8_t chByte)
     __protect_queue__ {
         if(this.hwHead == this.hwTail &&
            0 != this.hwLength ){
-            //! queue is full
-            continue;
+           if(this.bIsCover == false){
+                /* queue is full */
+                continue;
+            }else{
+               /*  overwrite */
+                this.hwHead++;
+                if(this.hwHead >= this.hwSize){
+                    this.hwHead = 0;
+                }
+                this.hwLength--;
+                this.hwPeek = this.hwHead;
+                this.hwPeekLength = this.hwLength;
+            }
         }
         this.pchBuffer[this.hwTail++] = chByte;
         if(this.hwTail >= this.hwSize){
@@ -75,16 +104,43 @@ uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
 
     uint8_t *pchByte = pDate;
     __protect_queue__ {
+        if(hwLength > this.hwSize){
+            hwLength = this.hwSize;
+        }
         if(this.hwHead == this.hwTail &&
            0 != this.hwLength ){
-            /* queue is full */
-            hwLength = 0;
-            continue;
+            if(this.bIsCover == false){
+                /* queue is full */
+                hwLength = 0;
+                continue;
+            }else{
+                 /* overwrite */
+                if(hwLength < (this.hwSize - this.hwHead)) {
+                    this.hwHead += hwLength;
+                }else{
+                    this.hwHead = hwLength - (this.hwSize - this.hwHead);
+                } 
+                this.hwLength -= hwLength;
+                this.hwPeek = this.hwHead;
+                this.hwPeekLength = this.hwLength;                                  
+            }
         }
-
         if(hwLength > (this.hwSize - this.hwLength)){
-            /* drop some data */
-            hwLength = this.hwSize - this.hwLength;
+            if(this.bIsCover == false){
+                /* drop some data */
+                hwLength = this.hwSize - this.hwLength;
+            }else{
+                /* overwrite some data */ 
+                uint16_t hwOverLength = hwLength - ((this.hwSize - this.hwLength));
+                if(hwOverLength < (this.hwSize - this.hwHead)) {
+                    this.hwHead += hwOverLength;
+                }else{
+                    this.hwHead = hwLength - (this.hwSize - this.hwHead);
+                } 
+                this.hwLength -= hwOverLength;
+                this.hwPeek = this.hwHead;
+                this.hwPeekLength = this.hwLength;                                         
+            }
         }
 
         do{

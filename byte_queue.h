@@ -1,3 +1,20 @@
+/****************************************************************************
+*  Copyright 2022 KK                                                        *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 #ifndef QUEUE_QUEUE_H_
 #define QUEUE_QUEUE_H_
 #include ".\app_cfg.h"
@@ -54,6 +71,12 @@
     peek_bytes_queue((__QUEUE), (__ADDR), (__ITEM_COUNT * sizeof(__TYPE)))
 
 
+#define __QUEUE_INIT_0(__QUEUE, __BUFFER, __SIZE )            \
+    queue_init_byte(__QUEUE, __BUFFER, __SIZE, false )
+    
+#define __QUEUE_INIT_1(__QUEUE, __BUFFER, __SIZE, __COVER )          \
+    queue_init_byte(__QUEUE, __BUFFER, __SIZE, __COVER )
+    
 /*!
  * \brief Initialize the queue object.
  *
@@ -72,11 +95,13 @@
     \endcode
  */
 
-#define queue_init(__queue,__buffer,__size)                 \
-    queue_init_byte(__queue, __buffer, __size )
+#define queue_init(__queue,__buffer,__size ,... )                 \
+    __PLOOC_EVAL(__QUEUE_INIT_,##__VA_ARGS__)        \
+    (__queue,(__buffer),(__size),##__VA_ARGS__)
 
-#define QUEUE_INIT(__QUEUE, __BUFFER, __SIZE )               \
-    queue_init_byte(__QUEUE, __BUFFER, __SIZE )
+#define QUEUE_INIT(__QUEUE, __BUFFER, __SIZE ,... )               \
+    __PLOOC_EVAL(__QUEUE_INIT_,##__VA_ARGS__)        \
+    (__QUEUE,(__BUFFER),(__SIZE),##__VA_ARGS__)
 
 
 /*!
@@ -191,13 +216,14 @@ def_class(byte_queue_t,
               uint16_t hwLength;
               uint16_t hwPeek;
               uint16_t hwPeekLength;
+              bool bIsCover;
           )
          )
 end_def_class(byte_queue_t)
 
 
 extern
-byte_queue_t * queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwItemSize);
+byte_queue_t * queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwItemSize,bool bIsCover);
 
 extern
 bool reset_queue(byte_queue_t *ptObj);
