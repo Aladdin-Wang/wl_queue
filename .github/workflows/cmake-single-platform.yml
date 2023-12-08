@@ -2,9 +2,9 @@ name: Build documentation and pack
 on:
   workflow_dispatch:
   push:
-    branches: [ developing ]
+    branches: [ main ]
   pull_request:
-    branches: [ developing ]
+    branches: [ main ]
   release:
     types: [published]
 jobs:
@@ -12,7 +12,8 @@ jobs:
     name: Generate pack
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -20,12 +21,12 @@ jobs:
         if: ${{ github.event_name == 'release' }}
         run: |
           git fetch --tags --force
-
-      - name: get submodules
-        run: |
-          git submodule update --init
-
-      - uses: Open-CMSIS-Pack/gen-pack-action@main
+          
+      - name: Make gen_pack.sh executable
+        run: chmod +x ./gen_pack.sh
+          
+      - name: Generate Pack
+        uses: Open-CMSIS-Pack/gen-pack-action@main
         with:
           doxygen-version: 1.0.0
           packchk-version: 1.3.96
