@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<package schemaVersion="1.7.28" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.28/schema/PACK.xsd">
+  <vendor>kk</vendor>
+  <name>byte_queue</name>
+  <description>A circular queue library written in C that supports arbitrary types.</description>
+  <url>https://github.com/Aladdin-Wang/byte_queue/</url>
+  <supportContact>https://github.com/Aladdin-Wang/byte_queue/issues</supportContact>
+  <license>lib/LICENSE</license>
+
+  <!-- optional license file -->
+  <!-- <license></license> -->
+
+  <repository type="git">https://github.com/Aladdin-Wang/byte_queue.git</repository>
+
+  <releases>
+    <!--automatically generated content, please do not modify -->
+    <release version="1.0.0" tag="1.0.0" url="https://github.com/Aladdin-Wang/byte_queue/raw/main/byte_queue.pack">
+      Initial release of byte_queue library.
+    </release>
+  </releases>
+
+  <keywords>
+    <!-- keywords for indexing -->
+    <keyword>Circular Queue</keyword>
+    <keyword>C Language</keyword>
+    <keyword>Data Structures</keyword>
+  </keywords>
+
+  <components>
+    <component Cclass="Software" Cversion="1.0.0" Cgroup="byte_queue" Csub="Library" Cvariant="Source" isDefaultVariant="true">
+      <description>A circular queue library written in C that supports arbitrary types.</description>
+      <files>
+        <file category="header" name="byte_queue.h"/>
+        <file category="sourceC" name="byte_queue.c"/>
+      </files>
+    </component>
+  </components>
+
+  <!-- optional taxonomy section for defining new component Class and Group names -->
+  <taxonomy>
+    <description Cclass="Software" Cgroup="byte_queue" doc="documents/Doxygen/html/index.html">A circular queue library written in C that supports arbitrary types.</description>
+  </taxonomy>
+</package>
