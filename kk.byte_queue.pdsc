@@ -6,7 +6,7 @@
   <description>A circular queue library written in C that supports arbitrary types.</description>
   <url>https://github.com/Aladdin-Wang/byte_queue/</url>
   <supportContact>https://github.com/Aladdin-Wang/byte_queue/issues</supportContact>
-  <license>lib/LICENSE</license>
+  <license>LICENSE</license>
 
   <!-- optional license file -->
   <!-- <license></license> -->
@@ -14,7 +14,7 @@
   <repository type="git">https://github.com/Aladdin-Wang/byte_queue.git</repository>
 
   <releases>
-    <!--automatically generated content, please do not modify -->
+    <!-- automatically generated content, please do not modify -->
     <release version="1.0.0" tag="1.0.0" url="https://github.com/Aladdin-Wang/byte_queue/raw/main/byte_queue.pack">
       Initial release of byte_queue library.
     </release>
