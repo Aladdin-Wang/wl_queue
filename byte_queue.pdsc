@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<package schemaVersion="1.7.28" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.28/schema/PACK.xsd">
+  <vendor>kk</vendor>
+  <name>byte_queue</name>
+  <description>A circular queue written in C that supports arbitrary data types.</description>
+  <url>https://github.com/Aladdin-Wang/byte_queue</url>
+  <supportContact>https://github.com/Aladdin-Wang/byte_queue/issues</supportContact>
+  <license>lib/LICENSE</license>
+
+  <repository type="git">https://github.com/Aladdin-Wang/byte_queue.git</repository>
+  
+  <releases>
+    <release version="1.0.0" tag="1.0.0" url="https://github.com/Aladdin-Wang/byte_queue/releases/tag/1.0.0">
+      Initial release of byte_queue.
+    </release>
+  </releases>
+
+  <keywords>
+    <keyword>C</keyword>
+    <keyword>Circular Queue</keyword>
+    <keyword>Data Structure</keyword>
+  </keywords>
+
+  <conditions>
+    <condition id="Cortex-M Arm GCC">
+      <description>Compile for Cortex-M processors using GNU Tools for Arm Embedded Processors.</description>
+      <require condition="Arm GCC"/>
+      <require condition="Cortex-M Processors"/>
+    </condition>
+    <!-- Add more conditions as needed -->
+  </conditions>
+
+  <components>
+    <component Cclass="Utilities" Cversion="1.0.0" Cgroup="byte_queue" Csub="Core" Cvariant="Library" condition="Cortex-M Arm GCC">
+      <description>A circular queue library written in C.</description>
+      <files>
+        <file category="header" name="byte_queue.h"/>
+        <file category="sourceC" name="byte_queue.c"/>
+        <file category="library" name="lib/byte_queue.lib" condition="Cortex-M Arm GCC"/>
+      </files>
+      <!-- Add any additional configurations or settings as needed -->
+    </component>
+    <!-- Add more components as needed -->
+  </components>
+
+  <taxonomy>
+    <description Cclass="Utilities" Cgroup="byte_queue" doc="documents/Doxygen/html/index.html">A circular queue written in C that supports arbitrary data types.</description>
+  </taxonomy>
+
+</package>
