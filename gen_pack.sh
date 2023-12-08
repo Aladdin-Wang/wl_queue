@@ -28,12 +28,12 @@ DEFAULT_ARGS=(-c "v")
 # An empty list defaults to all folders next to this script.
 # Default: empty (all folders)
 #
- PACK_DIRS="
-   benchmark
-   documents
-   os
-   lib
- "
+# PACK_DIRS="
+#   benchmark
+#   documents
+#   os
+#   lib
+# "
 
 # Specify file names to be added to pack base directory
 # Default: empty
