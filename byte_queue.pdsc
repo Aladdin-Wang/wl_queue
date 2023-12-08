@@ -27,38 +27,12 @@
     <keyword>Data Structures</keyword>
   </keywords>
 
-  <conditions>
-    <!-- 添加以下条件定义 -->
-    <condition id="Cortex-M Arm GCC">
-      <description>Compile for Cortex-M processors using GNU Tools for Arm Embedded Processors.</description>
-      <require condition="Arm GCC"/>
-      <require condition="Cortex-M Processors"/>
-    </condition>
-  </conditions>
-
-  <!-- apis section (optional - for Application Programming Interface descriptions) -->
-  <!-- <apis></apis> -->
-
-  <!-- boards section (mandatory for Board Support Packs) -->
-  <!-- <boards></boards> -->
-
-  <!-- devices section (mandatory for Device Family Packs) -->
-  <!-- <devices></devices> -->
-
-  <!-- examples section (optional for all Software Packs)-->
-  <!-- <examples></examples> -->
-
-  <!-- conditions section (optional for all Software Packs)-->
-  <!-- <conditions></conditions> -->
-
   <components>
     <component Cclass="Software" Cversion="1.0.0" Cgroup="byte_queue" Csub="Library" Cvariant="Source" isDefaultVariant="true">
       <description>A circular queue library written in C that supports arbitrary types.</description>
       <files>
         <file category="header" name="byte_queue.h"/>
         <file category="sourceC" name="byte_queue.c"/>
-        <!-- 添加以下文件 -->
-        <file category="library" name="lib/byte_queue.lib" condition="Cortex-M Arm GCC"/>
       </files>
     </component>
   </components>
