@@ -4,7 +4,7 @@
   <vendor>kk</vendor>
   <name>byte_queue</name>
   <description>A circular queue library written in C that supports arbitrary types.</description>
-  <url>https://raw.githubusercontent.com/Aladdin-Wang/byte_queue/main/</url>
+  <url>https://github.com/Aladdin-Wang/byte_queue/</url>
   <supportContact>https://github.com/Aladdin-Wang/byte_queue/issues</supportContact>
   <license>LICENSE</license>
 
@@ -19,8 +19,11 @@
       Active development ...
     </release>
     <!-- automatically generated content, please do not modify -->
-    <release date="2023-12-09" version="1.0.0" tag="1.0.0" url="https://raw.githubusercontent.com/Aladdin-Wang/byte_queue/main/kk.byte_queue.pack">
+    <release date="2023-12-09" version="1.0.0" tag="1.0.0" >
       Initial release of byte_queue.
+    </release>
+	<release version="0.0.0-dirty1+g1e1cb96" tag="0.0.0-dirty1+g1e1cb96">
+    ...
     </release>
   </releases>
 

@@ -15,7 +15,7 @@ DEFAULT_ARGS=(-c "v")
 
 # Pack warehouse directory - destination
 # Set the output directory to ./cmsis-pack
-PACK_OUTPUT=./cmsis-pack
+#PACK_OUTPUT=./cmsis-pack
 
 # Temporary pack build directory,
 # Default: ./build
