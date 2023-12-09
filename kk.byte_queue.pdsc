@@ -33,7 +33,14 @@
     <keyword>C Language</keyword>
     <keyword>Data Structures</keyword>
   </keywords>
-
+  
+  <conditions> 
+	<condition id="CMSIS-CORE">
+		<description>Require CMSIS-CORE Support</description>
+		<require Cclass="CMSIS" Cgroup="CORE"/>
+	</condition>	
+  </conditions>	
+	
   <components>
     <!-- byte_queue 组件 -->
     <component Cclass="Software" Cversion="1.0.0" Cgroup="byte_queue" Csub="Library" Cvariant="Source" isDefaultVariant="true">
@@ -43,11 +50,7 @@
         <file category="sourceC" name="byte_queue.c"/>
       </files>
     </component>
-
-	<condition id="CMSIS-CORE">
-		<description>Require CMSIS-CORE Support</description>
-		<require Cclass="CMSIS" Cgroup="CORE"/>
-	</condition>
+	
   </components>
 
   <!-- optional taxonomy section for defining new component Class and Group names -->
