@@ -3,9 +3,9 @@ name: Build documentation and pack
 on:
   workflow_dispatch:
   push:
-    branches: [ developing ]
+    branches: [ main ]
   pull_request:
-    branches: [ developing ]
+    branches: [ main ]
   release:
     types: [published]
 
