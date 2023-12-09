@@ -43,7 +43,13 @@
         <file category="sourceC" name="byte_queue.c"/>
       </files>
     </component>
-   
+    <!-- PLOOC 组件，表示 byte_queue 对 PLOOC 的依赖 -->
+    <component Cclass="Language Extension" Cversion="4.6.2" Cgroup="PLOOC">
+        <description>The Protected Low-overhead Object Oriented Programming with ANSI-C.</description>
+        <files>
+            <!-- Add files related to PLOOC if necessary -->
+        </files>
+    </component>   
   </components>
 
   <!-- optional taxonomy section for defining new component Class and Group names -->
