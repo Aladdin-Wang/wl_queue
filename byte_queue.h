@@ -17,7 +17,7 @@
 
 #ifndef QUEUE_QUEUE_H_
 #define QUEUE_QUEUE_H_
-#include ".\app_cfg.h"
+
 #if USE_SERVICE_QUEUE == ENABLED
 #include <stdint.h>
 #include <string.h>
