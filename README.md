@@ -277,7 +277,7 @@ int16_t dequeue_bytes(byte_queue_t *ptObj, void *pchByte, uint16_t hwLength);
 typeof() 是GUN C提供的一种特性，可参考C-Extensions，它可以取得变量的类型，或者表达式的类型。
 使用typeof来获取接收地址的类型，然后通过sizeof获取类似的大小，从而确定需要读出的数据长度。
 **宏的重载**
-文章[C语言变参函数和可变参数宏](https://blog.csdn.net/sinat_31039061/article/details/120496363?spm=1001.2014.3001.5502)，介绍了宏的重载原理，宏DEQUEUE直接使用了PLOOC已经实现好的`__PLOOC_EVAL`宏。
+文章[C语言变参函数和可变参数宏](https://blog.csdn.net/sinat_31039061/article/details/128338331?spm=1001.2014.3001.5502)，介绍了宏的重载原理，宏DEQUEUE直接使用了PLOOC已经实现好的`__PLOOC_EVAL`宏。
 
 ##  3.快速使用
 
