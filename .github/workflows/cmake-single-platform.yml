@@ -17,10 +17,6 @@ jobs:
         if: ${{ github.event_name == 'release' }}
         run: |
           git fetch --tags --force
-
-      - name: get submodules
-        run: |
-          git submodule update --init
           
       - name: Make gen_pack.sh executable
         run: chmod +x ./gen_pack.sh
