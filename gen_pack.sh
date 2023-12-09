@@ -2,6 +2,7 @@
 # Version: 2.7
 # Date: 2023-05-22
 # This bash script generates a CMSIS Software Pack:
+#
 
 set -o pipefail
 
@@ -14,8 +15,9 @@ REQUIRED_GEN_PACK_LIB="0.8.4"
 DEFAULT_ARGS=(-c "v")
 
 # Pack warehouse directory - destination
-# Set the output directory to ./cmsis-pack
-#PACK_OUTPUT=./cmsis-pack
+# Default: ./output
+#
+# PACK_OUTPUT=./output
 
 # Temporary pack build directory,
 # Default: ./build
@@ -26,12 +28,9 @@ DEFAULT_ARGS=(-c "v")
 # An empty list defaults to all folders next to this script.
 # Default: empty (all folders)
 #
-# PACK_DIRS="
-#   benchmark
-#   documents
-#   os
-#   lib
-# "
+#PACK_DIRS="
+#
+#"
 
 # Specify file names to be added to pack base directory
 # Default: empty
@@ -141,6 +140,6 @@ function load_lib() {
 }
 
 load_lib
-gen_pack "${DEFAULT_ARGS[@]}" --output "${PACK_OUTPUT}" "$@"
+gen_pack "${DEFAULT_ARGS[@]}" "$@"
 
 exit 0
