@@ -1,8 +1,10 @@
 name: Build documentation and pack
+
 on:
   workflow_dispatch:
   release:
     types: [published]
+
 jobs:
   pack:
     name: Generate pack
@@ -20,7 +22,7 @@ jobs:
           
       - name: Make gen_pack.sh executable
         run: chmod +x ./gen_pack.sh
-          
+
       - name: Generate Pack
         uses: Open-CMSIS-Pack/gen-pack-action@main
         with:
@@ -28,3 +30,13 @@ jobs:
           packchk-version: 1.3.96
           gen-pack-script: ./gen_pack.sh
           gen-pack-output: ./output
+
+      - name: Copy .pack file
+        run: cp ./output/kk.byte_queue.1.0.0.pack ./release/kk.byte_queue.1.0.0.pack
+
+      - name: Upload release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          files: ./release/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
