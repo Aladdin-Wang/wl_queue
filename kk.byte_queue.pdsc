@@ -46,7 +46,7 @@
 	
   <components>
     <!-- byte_queue 组件 -->
-    <component Cclass="Software" Cversion="1.0.0" Cgroup="byte_queue" Csub="Library" Cvariant="Source" isDefaultVariant="true" condition="PLOOC">
+    <component Cclass="Software" Cversion="1.0.1" Cgroup="byte_queue" Csub="Library" Cvariant="Source" isDefaultVariant="true" condition="PLOOC">
       <description>A circular queue library written in C that supports arbitrary types.</description>
       <files>
         <file category="header" name="byte_queue.h"/>
