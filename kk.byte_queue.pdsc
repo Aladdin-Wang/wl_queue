@@ -35,15 +35,18 @@
   </keywords>
   
   <conditions> 
-	<condition id="CMSIS-CORE">
-		<description>Require CMSIS-CORE Support</description>
-		<require Cclass="CMSIS" Cgroup="CORE"/>
-	</condition>	
+    <!-- 添加对 PLOOC 的依赖 -->
+    <condition id="PLOOC">
+        <description>Require PLOOC Support</description>
+        <!-- 假设 PLOOC 的支持通过一个 Cclass 为 Language Extension、Cgroup 为 PLOOC、Cversion 为 4.6.2 的组件来实现 -->
+        <require Cclass="Language Extension" Cgroup="PLOOC" Cversion="4.6.2"/>
+    </condition>	
+	
   </conditions>	
 	
   <components>
     <!-- byte_queue 组件 -->
-    <component Cclass="Software" Cversion="1.0.0" Cgroup="byte_queue" Csub="Library" Cvariant="Source" isDefaultVariant="true">
+    <component Cclass="Software" Cversion="1.0.0" Cgroup="byte_queue" Csub="Library" Cvariant="Source" isDefaultVariant="true" condition="PLOOC">
       <description>A circular queue library written in C that supports arbitrary types.</description>
       <files>
         <file category="header" name="byte_queue.h"/>
