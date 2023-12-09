@@ -19,6 +19,9 @@
       Active development ...
     </release>
     <!-- automatically generated content, please do not modify -->
+    <release date="2023-12-09" version="1.0.1" tag="1.0.1" >
+      Initial release of byte_queue.
+    </release>	
     <release date="2023-12-09" version="1.0.0" tag="1.0.0" >
       Initial release of byte_queue.
     </release>
