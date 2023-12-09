@@ -47,10 +47,6 @@
     <!-- PLOOC 组件，表示 byte_queue 对 PLOOC 的依赖 -->
     <component Cclass="Language Extension" Cgroup="PLOOC" Cversion="4.6.2">
       <description>A low-overhead OOPC template.</description>
-      <files>
-        <file category="header" name="plooc.h"/>
-        <!-- 其他 PLOOC 文件... -->
-      </files>
     </component>
   </components>
 
