@@ -1,5 +1,5 @@
 /****************************************************************************
-*  Copyright 2022 KK (weixin:Aladdin_KK)                                    *
+*  Copyright 2022 KK (https://github.com/WALI-KANG)                                    *
 *                                                                           *
 *  Licensed under the Apache License, Version 2.0 (the "License");          *
 *  you may not use this file except in compliance with the License.         *
@@ -16,12 +16,22 @@
 ****************************************************************************/
 
 #define __BYTE_QUEUE_CLASS_IMPLEMENT__
-#include "byte_queue.h"
+#include "wl_queue.h"
 
 #if USE_SERVICE_QUEUE == ENABLED
 #undef this
 #define this        (*ptThis)
 
+/****************************************************************************
+* Function: queue_init_byte                                               *
+* Description: Initializes a byte queue object.                           *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object to be initialized.       *
+*   - pBuffer: Pointer to the buffer for storing data.                    *
+*   - hwItemSize: Size of each item in the buffer.                        *
+*   - bIsCover: Indicates whether the queue should overwrite when full.  *
+* Returns: Pointer to the initialized byte_queue_t object or NULL.       *
+****************************************************************************/
 byte_queue_t * queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwItemSize,bool bIsCover)
 {
     assert(NULL != ptObj);
@@ -32,7 +42,7 @@ byte_queue_t * queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwIt
         return NULL;
     }
 
-    __protect_queue__ {
+    safe_atom_code() {
         this.pchBuffer = pBuffer;
         this.hwSize = hwItemSize;
         this.hwHead = 0;
@@ -44,14 +54,20 @@ byte_queue_t * queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwIt
     }
     return ptObj;
 }
-
+/****************************************************************************
+* Function: reset_queue                                                   *
+* Description: Resets the byte queue to its initial state.                *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object to be reset.             *
+* Returns: True if the reset is successful, false otherwise.             *
+****************************************************************************/
 bool reset_queue(byte_queue_t *ptObj)
 {
     assert(NULL != ptObj);
     /* initialise "this" (i.e. ptThis) to access class members */
     class_internal(ptObj, ptThis, byte_queue_t);
 
-    __protect_queue__ {
+    safe_atom_code() {
         this.hwHead = 0;
         this.hwTail = 0;
         this.hwLength = 0;
@@ -61,13 +77,22 @@ bool reset_queue(byte_queue_t *ptObj)
     return true;
 }
 
+/****************************************************************************
+* Function: enqueue_byte                                                  *
+* Description: Enqueues a single byte into the byte queue.               *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+*   - chByte: Byte to be enqueued.                                       *
+* Returns: True if the enqueue is successful, false otherwise.           *
+****************************************************************************/
+
 bool enqueue_byte(byte_queue_t *ptObj, uint8_t chByte)
 {
     assert(NULL != ptObj);
     /* initialise "this" (i.e. ptThis) to access class members */
     class_internal(ptObj, ptThis, byte_queue_t);
     bool  bResult = false;
-    __protect_queue__ {
+    safe_atom_code() {
         if(this.hwHead == this.hwTail &&
            0 != this.hwLength ){
            if(this.bIsCover == false){
@@ -95,6 +120,16 @@ bool enqueue_byte(byte_queue_t *ptObj, uint8_t chByte)
     return bResult;
 }
 
+/****************************************************************************
+* Function: enqueue_bytes                                                 *
+* Description: Enqueues multiple bytes into the byte queue.              *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+*   - pDate: Pointer to the data to be enqueued.                         *
+*   - hwLength: Number of bytes to enqueue.                               *
+* Returns: Number of bytes actually enqueued.                             *
+****************************************************************************/
+
 uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
 {
     assert(NULL != ptObj);
@@ -103,7 +138,7 @@ uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
     class_internal(ptObj, ptThis, byte_queue_t);
 
     uint8_t *pchByte = pDate;
-    __protect_queue__ {
+    safe_atom_code() {
         if(hwLength > this.hwSize){
             hwLength = this.hwSize;
         }
@@ -161,6 +196,15 @@ uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
     return hwLength;
 }
 
+/****************************************************************************
+* Function: dequeue_byte                                                  *
+* Description: Dequeues a single byte from the byte queue.               *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+*   - pchByte: Pointer to store the dequeued byte.                       *
+* Returns: True if the dequeue is successful, false otherwise.           *
+****************************************************************************/
+
 bool dequeue_byte(byte_queue_t *ptObj, uint8_t *pchByte)
 {
     assert(NULL != ptObj);
@@ -168,7 +212,7 @@ bool dequeue_byte(byte_queue_t *ptObj, uint8_t *pchByte)
     /* initialise "this" (i.e. ptThis) to access class members */
     class_internal(ptObj, ptThis, byte_queue_t);
     bool  bResult = false;
-    __protect_queue__ {
+    safe_atom_code() {
 
         if(this.hwHead == this.hwTail &&
            0 == this.hwLength ){
@@ -190,6 +234,16 @@ bool dequeue_byte(byte_queue_t *ptObj, uint8_t *pchByte)
     return bResult;
 }
 
+/****************************************************************************
+* Function: dequeue_bytes                                                 *
+* Description: Dequeues multiple bytes from the byte queue.              *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+*   - pDate: Pointer to store the dequeued data.                         *
+*   - hwLength: Number of bytes to dequeue.                               *
+* Returns: Number of bytes actually dequeued.                             *
+****************************************************************************/
+
 uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
 {
     assert(NULL != ptObj);
@@ -199,7 +253,7 @@ uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
     class_internal(ptObj, ptThis, byte_queue_t);
 
     uint8_t *pchByte = pDate;
-    __protect_queue__ {
+    safe_atom_code() {
 
         if(this.hwHead == this.hwTail &&
            0 == this.hwLength ){
@@ -232,6 +286,14 @@ uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
     return hwLength;
 }
 
+/****************************************************************************
+* Function: is_queue_empty                                                *
+* Description: Checks if the byte queue is empty.                         *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+* Returns: True if the queue is empty, false otherwise.                  *
+****************************************************************************/
+
 bool is_queue_empty(byte_queue_t *ptObj)
 {
     assert(NULL != ptObj);
@@ -246,6 +308,14 @@ bool is_queue_empty(byte_queue_t *ptObj)
     return false;
 }
 
+/****************************************************************************
+* Function: get_queue_count                                               *
+* Description: Gets the current number of elements in the byte queue.     *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+* Returns: Number of elements in the queue.                               *
+****************************************************************************/
+
 uint16_t get_queue_count(byte_queue_t *ptObj)
 {
     assert(NULL != ptObj);
@@ -254,6 +324,13 @@ uint16_t get_queue_count(byte_queue_t *ptObj)
 
     return (this.hwLength);
 }
+/****************************************************************************
+* Function: get_queue_available_count                                     *
+* Description: Gets the available space in the byte queue.               *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+* Returns: Available space in the queue.                                  *
+****************************************************************************/
 
 uint16_t get_queue_available_count(byte_queue_t *ptObj)
 {
@@ -263,6 +340,14 @@ uint16_t get_queue_available_count(byte_queue_t *ptObj)
 
     return (this.hwSize - this.hwLength);
 }
+
+/****************************************************************************
+* Function: is_peek_empty                                                 *
+* Description: Checks if the peek buffer is empty.                        *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+* Returns: True if the peek buffer is empty, false otherwise.            *
+****************************************************************************/
 
 bool is_peek_empty(byte_queue_t *ptObj)
 {
@@ -278,6 +363,15 @@ bool is_peek_empty(byte_queue_t *ptObj)
     return false;
 }
 
+/****************************************************************************
+* Function: peek_byte_queue                                               *
+* Description: Peeks a single byte from the byte queue without dequeuing. *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+*   - pchByte: Pointer to store the peeked byte.                         *
+* Returns: True if peek is successful, false otherwise.                  *
+****************************************************************************/
+
 bool peek_byte_queue(byte_queue_t *ptObj, uint8_t *pchByte)
 {
     assert(NULL != ptObj);
@@ -286,7 +380,7 @@ bool peek_byte_queue(byte_queue_t *ptObj, uint8_t *pchByte)
     /* initialise "this" (i.e. ptThis) to access class members */
     class_internal(ptObj, ptThis, byte_queue_t);
     bool  bResult = false;
-    __protect_queue__ {
+    safe_atom_code() {
 
         if(this.hwPeek == this.hwTail &&
            0 == this.hwPeekLength ){
@@ -306,6 +400,16 @@ bool peek_byte_queue(byte_queue_t *ptObj, uint8_t *pchByte)
     return bResult;
 }
 
+/****************************************************************************
+* Function: peek_bytes_queue                                              *
+* Description: Peeks multiple bytes from the byte queue without dequeuing.*
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+*   - pDate: Pointer to store the peeked data.                           *
+*   - hwLength: Number of bytes to peek.                                  *
+* Returns: Number of bytes actually peeked.                               *
+****************************************************************************/
+
 uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
 {
     assert(NULL != ptObj);
@@ -316,7 +420,7 @@ uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
 
     uint8_t *pchByte = pDate;
 
-    __protect_queue__ {
+    safe_atom_code() {
         if(this.hwPeek == this.hwTail &&
            0 == this.hwPeekLength ){
             /* empty */
@@ -346,18 +450,34 @@ uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
     return hwLength;
 }
 
+/****************************************************************************
+* Function: reset_peek                                                    *
+* Description: Resets the peek buffer to its initial state.               *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+* Returns: True if the reset is successful, false otherwise.             *
+****************************************************************************/
+
 bool reset_peek(byte_queue_t *ptObj)
 {
     assert(NULL != ptObj);
     /* initialise "this" (i.e. ptThis) to access class members */
     class_internal(ptObj, ptThis, byte_queue_t);
 
-    __protect_queue__ {
+    safe_atom_code() {
         this.hwPeek = this.hwHead;
         this.hwPeekLength = this.hwLength;
     }
     return true;
 }
+
+/****************************************************************************
+* Function: get_all_peeked                                                *
+* Description: Moves all peeked elements back to the queue.              *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+* Returns: True if successful, false otherwise.                          *
+****************************************************************************/
 
 bool get_all_peeked(byte_queue_t *ptObj)
 {
@@ -365,12 +485,20 @@ bool get_all_peeked(byte_queue_t *ptObj)
     /* initialise "this" (i.e. ptThis) to access class members */
     class_internal(ptObj, ptThis, byte_queue_t);
 
-    __protect_queue__ {
+    safe_atom_code() {
         this.hwHead = this.hwPeek;
         this.hwLength = this.hwPeekLength;
     }
     return true;
 }
+
+/****************************************************************************
+* Function: get_peek_status                                               *
+* Description: Gets the current status of the peek buffer.               *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+* Returns: Current number of elements in the peek buffer.                *
+****************************************************************************/
 
 uint16_t get_peek_status(byte_queue_t *ptObj)
 {
@@ -380,7 +508,7 @@ uint16_t get_peek_status(byte_queue_t *ptObj)
 
     uint16_t hwCount;
 
-    __protect_queue__ {
+    safe_atom_code() {
         if(this.hwPeek >= this.hwHead){
             hwCount = this.hwPeek - this.hwHead;
         } else{
@@ -390,13 +518,22 @@ uint16_t get_peek_status(byte_queue_t *ptObj)
     return hwCount;
 }
 
+/****************************************************************************
+* Function: restore_peek_status                                           *
+* Description: Restores the peek buffer status to a previous count.      *
+* Parameters:                                                             *
+*   - ptObj: Pointer to the byte_queue_t object.                         *
+*   - hwCount: Number of elements to restore in the peek buffer.         *
+* Returns: True if successful, false otherwise.                          *
+****************************************************************************/
+
 bool restore_peek_status(byte_queue_t *ptObj, uint16_t hwCount)
 {
     assert(NULL != ptObj);
     /* initialise "this" (i.e. ptThis) to access class members */
     class_internal(ptObj, ptThis, byte_queue_t);
 
-    __protect_queue__ {
+    safe_atom_code() {
         if(this.hwHead + hwCount < this.hwSize){
             this.hwPeek = this.hwHead + hwCount;
         } else{

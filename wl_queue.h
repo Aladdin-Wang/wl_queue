@@ -1,5 +1,5 @@
 /****************************************************************************
-*  Copyright 2022 KK (weixin:Aladdin_KK)                                    *
+*  Copyright 2022 KK (https://github.com/Aladdin-Wang)                                    *
 *                                                                           *
 *  Licensed under the Apache License, Version 2.0 (the "License");          *
 *  you may not use this file except in compliance with the License.         *
@@ -34,10 +34,36 @@
 
 #include "plooc_class.h"
 
+#undef __CONNECT2
+#undef CONNECT2
+#undef __CONNECT3
+#undef CONNECT3
 
-#ifndef __protect_queue__
+#define __CONNECT3(__A, __B, __C)         __A##__B##__C
+#define __CONNECT2(__A, __B)              __A##__B
+
+#define CONNECT3(__A, __B, __C)           __CONNECT3(__A, __B, __C)
+#define CONNECT2(__A, __B)                __CONNECT2(__A, __B)
+
+#ifndef SAFE_NAME
+#define SAFE_NAME(__NAME)   CONNECT3(__,__NAME,__LINE__)
+#endif
+
+#if USE_PERF_COUNTER == ENABLED
     #include "perf_counter.h"
-    #define __protect_queue__  __IRQ_SAFE
+#else
+#ifndef safe_atom_code
+    #include "cmsis_compiler.h"	
+    #define safe_atom_code()                                            \
+            for(  uint32_t SAFE_NAME(temp) =                             \
+					({uint32_t SAFE_NAME(temp2)=__get_PRIMASK();       \
+						__disable_irq();                                 \
+						 SAFE_NAME(temp2);}),*SAFE_NAME(temp3) = NULL;    \
+					      SAFE_NAME(temp3)++ == NULL;                      \
+					        __set_PRIMASK(SAFE_NAME(temp)))
+						 
+							
+#endif
 #endif
 
 #define __DEQUEUE_0( __QUEUE, __ADDR)                                \
@@ -243,6 +269,9 @@ uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength);
 extern
 bool is_queue_empty(byte_queue_t *ptQueue);
 
+extern
+bool is_peek_empty(byte_queue_t *ptObj);
+	
 extern
 bool peek_byte_queue(byte_queue_t *ptQueue, uint8_t *pchByte);
 
