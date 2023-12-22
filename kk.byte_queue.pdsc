@@ -19,6 +19,9 @@
       Active development ...
     </release>
     <!-- automatically generated content, please do not modify -->
+	<release date="2023-12-09" version="1.0.2" tag="1.0.2" >
+      Initial release of byte_queue.
+    </release>	
     <release date="2023-12-09" version="1.0.1" tag="1.0.1" >
       Initial release of byte_queue.
     </release>	
@@ -46,7 +49,7 @@
 	
   <components>
     <!-- byte_queue 组件 -->
-    <component Cclass="Software" Cversion="1.0.1" Cgroup="byte_queue" condition="PLOOC">
+    <component Cclass="WALI_FrameWork" Cversion="1.0.2" Cgroup="byte_queue" condition="PLOOC">
       <description>A circular queue library written in C that supports arbitrary types.</description>
       <files>
         <file category="header" name="byte_queue.h"/>
@@ -58,6 +61,6 @@
 
   <!-- optional taxonomy section for defining new component Class and Group names -->
   <taxonomy>
-    <description Cclass="Software" Cgroup="byte_queue" doc="documents/Doxygen/html/index.html">A circular queue library written in C that supports arbitrary types.</description>
+    <description Cclass="WALI_FrameWork" Cgroup="byte_queue" doc="documents/Doxygen/html/index.html">A circular queue library written in C that supports arbitrary types.</description>
   </taxonomy>
 </package>
