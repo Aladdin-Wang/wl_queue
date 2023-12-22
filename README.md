@@ -1,4 +1,4 @@
-# byte_queue(v1.0.0)
+# byte_queue
 
 一个C语言编写的支持任意类型的环形队列.
 
