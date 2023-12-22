@@ -16,7 +16,7 @@
 ****************************************************************************/
 
 #define __BYTE_QUEUE_CLASS_IMPLEMENT__
-#include "wl_queue.h"
+#include "byte_queue.h"
 
 #if USE_SERVICE_QUEUE == ENABLED
 #undef this
