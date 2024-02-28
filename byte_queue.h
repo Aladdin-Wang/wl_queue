@@ -18,21 +18,10 @@
 #ifndef QUEUE_QUEUE_H_
 #define QUEUE_QUEUE_H_
 
-#if USE_SERVICE_QUEUE == ENABLED
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
-#include <assert.h>
 
-#define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
-
-#if     defined(__BYTE_QUEUE_CLASS_IMPLEMENT__)
-    #define __PLOOC_CLASS_IMPLEMENT__
-#elif   defined(__BYTE_QUEUE_CLASS_INHERIT__)
-    #define __PLOOC_CLASS_INHERIT__
-#endif
-
-#include "plooc_class.h"
 
 #undef __CONNECT2
 #undef CONNECT2
@@ -49,60 +38,70 @@
 #define SAFE_NAME(__NAME)   CONNECT3(__,__NAME,__LINE__)
 #endif
 
-#if USE_PERF_COUNTER == ENABLED
-    #include "perf_counter.h"
-#else
+#ifndef __PLOOC_VA_NUM_ARGS_IMPL
+#   define __PLOOC_VA_NUM_ARGS_IMPL( _0,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,     \
+                                     _12,_13,_14,_15,_16,__N,...)      __N
+#endif
+
+#ifndef __PLOOC_VA_NUM_ARGS
+#define __PLOOC_VA_NUM_ARGS(...)                                                \
+	__PLOOC_VA_NUM_ARGS_IMPL( 0,##__VA_ARGS__,16,15,14,13,12,11,10,9,   \
+	                          8,7,6,5,4,3,2,1,0)
+#endif
+
 #ifndef safe_atom_code
-    #include "cmsis_compiler.h"	
-    #define safe_atom_code()                                            \
-            for(  uint32_t SAFE_NAME(temp) =                             \
-					({uint32_t SAFE_NAME(temp2)=__get_PRIMASK();       \
-						__disable_irq();                                 \
-						 SAFE_NAME(temp2);}),*SAFE_NAME(temp3) = NULL;    \
-					      SAFE_NAME(temp3)++ == NULL;                      \
-					        __set_PRIMASK(SAFE_NAME(temp)))
-						 
-							
+#include "cmsis_compiler.h"
+#define safe_atom_code()                                            \
+	#include "cmsis_compiler.h"
+#define safe_atom_code()                                            \
+	for(  uint32_t SAFE_NAME(temp) =                             \
+
+	({uint32_t SAFE_NAME(temp2)=__get_PRIMASK();       \
+		__disable_irq();                                 \
+		SAFE_NAME(temp2);}),*SAFE_NAME(temp3) = NULL;    \
+	                                        SAFE_NAME(temp3)++ == NULL;                      \
+	                                        __set_PRIMASK(SAFE_NAME(temp)))
 #endif
-#endif
+
 
 #define __DEQUEUE_0( __QUEUE, __ADDR)                                \
-    dequeue_bytes((__QUEUE), (__ADDR),(sizeof(typeof(*(__ADDR)))))
+	dequeue_bytes((__QUEUE), (__ADDR),(sizeof(typeof(*(__ADDR)))))
 
 #define __DEQUEUE_1( __QUEUE, __ADDR, __ITEM_COUNT)                        \
-    dequeue_bytes((__QUEUE), (__ADDR), __ITEM_COUNT*(sizeof(typeof((__ADDR[0])))))
+	dequeue_bytes((__QUEUE), (__ADDR), __ITEM_COUNT*(sizeof(typeof((__ADDR[0])))))
 
 #define __DEQUEUE_2( __QUEUE, __ADDR, __TYPE,__ITEM_COUNT)                 \
-    dequeue_bytes((__QUEUE), (__ADDR), (__ITEM_COUNT * sizeof(__TYPE)))
+	dequeue_bytes((__QUEUE), (__ADDR), (__ITEM_COUNT * sizeof(__TYPE)))
 
 
 #define __ENQUEUE_0( __QUEUE, __VALUE)                                     \
-    ({typeof((__VALUE)) SAFE_NAME(value) = __VALUE;                     \
-        enqueue_bytes((__QUEUE), &(SAFE_NAME(value)), (sizeof(__VALUE)));})
+
+({typeof((__VALUE)) SAFE_NAME(value) = __VALUE;                     \
+  enqueue_bytes((__QUEUE), &(SAFE_NAME(value)), (sizeof(__VALUE)));})
 
 #define __ENQUEUE_1( __QUEUE, __ADDR, __ITEM_COUNT)                         \
-    enqueue_bytes((__QUEUE), (__ADDR), __ITEM_COUNT*(sizeof(typeof((__ADDR[0])))))
+	enqueue_bytes((__QUEUE), (__ADDR), __ITEM_COUNT*(sizeof(typeof((__ADDR[0])))))
 
 #define __ENQUEUE_2( __QUEUE, __ADDR, __TYPE, __ITEM_COUNT)                 \
-    enqueue_bytes((__QUEUE), (__ADDR), (__ITEM_COUNT * sizeof(__TYPE)))
+	enqueue_bytes((__QUEUE), (__ADDR), (__ITEM_COUNT * sizeof(__TYPE)))
 
 
 #define __PEEK_QUEUE_0( __QUEUE, __ADDR)                               \
-    peek_bytes_queue((__QUEUE), (__ADDR), (sizeof(typeof(*(__ADDR)))))
+	peek_bytes_queue((__QUEUE), (__ADDR), (sizeof(typeof(*(__ADDR)))))
 
 #define __PEEK_QUEUE_1( __QUEUE, __ADDR, __ITEM_COUNT)                       \
-    peek_bytes_queue((__QUEUE), (__ADDR), __ITEM_COUNT*(sizeof(typeof((__ADDR[0])))))
+	peek_bytes_queue((__QUEUE), (__ADDR), __ITEM_COUNT*(sizeof(typeof((__ADDR[0])))))
 
 #define __PEEK_QUEUE_2( __QUEUE, __ADDR, __TYPE, __ITEM_COUNT)               \
-    peek_bytes_queue((__QUEUE), (__ADDR), (__ITEM_COUNT * sizeof(__TYPE)))
+	peek_bytes_queue((__QUEUE), (__ADDR), (__ITEM_COUNT * sizeof(__TYPE)))
 
 
 #define __QUEUE_INIT_0(__QUEUE, __BUFFER, __SIZE )            \
-    queue_init_byte(__QUEUE, __BUFFER, __SIZE, false )
-    
+	queue_init_byte(__QUEUE, __BUFFER, __SIZE, false )
+
 #define __QUEUE_INIT_1(__QUEUE, __BUFFER, __SIZE, __COVER )          \
-    queue_init_byte(__QUEUE, __BUFFER, __SIZE, __COVER )
-    
+	queue_init_byte(__QUEUE, __BUFFER, __SIZE, __COVER )
+
 /*!
  * \brief Initialize the queue object.
  *
@@ -122,12 +121,12 @@
  */
 
 #define queue_init(__queue,__buffer,__size ,... )                 \
-    __PLOOC_EVAL(__QUEUE_INIT_,##__VA_ARGS__)        \
-    (__queue,(__buffer),(__size),##__VA_ARGS__)
+	CONNECT2(__QUEUE_INIT_,__PLOOC_VA_NUM_ARGS(__VA_ARGS__))        \
+	(__queue,(__buffer),(__size),##__VA_ARGS__)
 
 #define QUEUE_INIT(__QUEUE, __BUFFER, __SIZE ,... )               \
-    __PLOOC_EVAL(__QUEUE_INIT_,##__VA_ARGS__)        \
-    (__QUEUE,(__BUFFER),(__SIZE),##__VA_ARGS__)
+	CONNECT2(__QUEUE_INIT_,__PLOOC_VA_NUM_ARGS(__VA_ARGS__))        \
+	(__QUEUE,(__BUFFER),(__SIZE),##__VA_ARGS__)
 
 
 /*!
@@ -157,12 +156,12 @@
     \endcode
  */
 #define dequeue(__queue,__addr,...)                       \
-    __PLOOC_EVAL(__DEQUEUE_,##__VA_ARGS__)        \
-    (__queue,(__addr),##__VA_ARGS__)
+	CONNECT2(__DEQUEUE_,__PLOOC_VA_NUM_ARGS(__VA_ARGS__))        \
+	(__queue,(__addr),##__VA_ARGS__)
 
 #define DEQUEUE(__QUEUE, __ADDR,...)                                            \
-    __PLOOC_EVAL(__DEQUEUE_,##__VA_ARGS__)                              \
-    (__QUEUE,(__ADDR),##__VA_ARGS__)
+	CONNECT2(__DEQUEUE_,__PLOOC_VA_NUM_ARGS(__VA_ARGS__))        \
+	(__QUEUE,(__ADDR),##__VA_ARGS__)
 
 
 /*!
@@ -193,12 +192,12 @@
  */
 
 #define enqueue(__queue, __addr,...)                    \
-    __PLOOC_EVAL(__ENQUEUE_,##__VA_ARGS__)      \
-    (__queue,(__addr),##__VA_ARGS__)
+	CONNECT2(__ENQUEUE_,__PLOOC_VA_NUM_ARGS(__VA_ARGS__))        \
+	(__queue,(__addr),##__VA_ARGS__)
 
 #define ENQUEUE(__QUEUE, __ADDR,...)                    \
-    __PLOOC_EVAL(__ENQUEUE_,##__VA_ARGS__)      \
-    (__QUEUE,(__ADDR),##__VA_ARGS__)
+	CONNECT2(__ENQUEUE_,__PLOOC_VA_NUM_ARGS(__VA_ARGS__))        \
+	(__QUEUE,(__ADDR),##__VA_ARGS__)
 
 
 /*!
@@ -223,33 +222,26 @@
  */
 
 #define peek_queue(__queue, __addr,...)                       \
-    __PLOOC_EVAL(__PEEK_QUEUE_,##__VA_ARGS__)          \
-    (__queue,(__addr),##__VA_ARGS__)
+	CONNECT2(__PEEK_QUEUE_,__PLOOC_VA_NUM_ARGS(__VA_ARGS__))        \
+	(__queue,(__addr),##__VA_ARGS__)
 
 #define PEEK_QUEUE(__QUEUE, __ADDR,...)                         \
-    __PLOOC_EVAL(__PEEK_QUEUE_,##__VA_ARGS__)            \
-    (__QUEUE,(__ADDR),##__VA_ARGS__)
+	CONNECT2(__PEEK_QUEUE_,__PLOOC_VA_NUM_ARGS(__VA_ARGS__))        \
+	(__QUEUE,(__ADDR),##__VA_ARGS__)
 
-
-
-declare_class(byte_queue_t)
-def_class(byte_queue_t,
-          private_member(
-              uint8_t *pchBuffer;
-              uint16_t hwSize;
-              uint16_t hwHead;
-              uint16_t hwTail;
-              uint16_t hwLength;
-              uint16_t hwPeek;
-              uint16_t hwPeekLength;
-              bool bIsCover;
-          )
-         )
-end_def_class(byte_queue_t)
-
+typedef struct byte_queue_t {
+	uint8_t *pchBuffer;
+	uint16_t hwSize;
+	uint16_t hwHead;
+	uint16_t hwTail;
+	uint16_t hwLength;
+	uint16_t hwPeek;
+	uint16_t hwPeekLength;
+	bool bIsCover;
+} byte_queue_t;
 
 extern
-byte_queue_t * queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwItemSize,bool bIsCover);
+byte_queue_t *queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwItemSize, bool bIsCover);
 
 extern
 bool reset_queue(byte_queue_t *ptObj);
@@ -271,7 +263,7 @@ bool is_queue_empty(byte_queue_t *ptQueue);
 
 extern
 bool is_peek_empty(byte_queue_t *ptObj);
-	
+
 extern
 bool peek_byte_queue(byte_queue_t *ptQueue, uint8_t *pchByte);
 
@@ -296,8 +288,4 @@ uint16_t get_queue_count(byte_queue_t *ptObj);
 extern
 uint16_t get_queue_available_count(byte_queue_t *ptObj);
 
-#undef __BYTE_QUEUE_CLASS_INHERIT__
-#undef __BYTE_QUEUE_CLASS_IMPLEMENT__
-
-#endif
 #endif /* QUEUE_QUEUE_H_ */
