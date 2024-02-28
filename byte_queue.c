@@ -37,7 +37,6 @@ byte_queue_t *queue_init_byte(byte_queue_t *ptObj, void *pBuffer, uint16_t hwIte
 	if (pBuffer == NULL || hwItemSize == 0) {
 		return NULL;
 	}
-
 	safe_atom_code() {
 		this.pchBuffer = pBuffer;
 		this.hwSize = hwItemSize;
@@ -62,7 +61,6 @@ bool reset_queue(byte_queue_t *ptObj) {
 	assert(NULL != ptObj);
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	safe_atom_code() {
 		this.hwHead = 0;
 		this.hwTail = 0;
@@ -130,7 +128,6 @@ uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength) {
 	assert(NULL != pDate);
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	uint8_t *pchByte = pDate;
 	safe_atom_code() {
 		if (hwLength > this.hwSize) {
@@ -171,7 +168,6 @@ uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength) {
 				this.hwPeekLength = this.hwLength;
 			}
 		}
-
 		do {
 		    if (hwLength < (this.hwSize - this.hwTail)) {
 				memcpy(&this.pchBuffer[this.hwTail], pchByte, hwLength);
@@ -183,7 +179,6 @@ uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength) {
 			memcpy(&this.pchBuffer[0], &pchByte[this.hwSize - this.hwTail], hwLength - (this.hwSize - this.hwTail));
 			this.hwTail = hwLength - (this.hwSize - this.hwTail);
 		} while (0);
-
 		this.hwLength += hwLength;
 		this.hwPeekLength += hwLength;
 	}
@@ -206,19 +201,15 @@ bool dequeue_byte(byte_queue_t *ptObj, uint8_t *pchByte) {
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
 	bool  bResult = false;
 	safe_atom_code() {
-
 		if (this.hwHead == this.hwTail &&
 		        0 == this.hwLength ) {
 			/* queue is empty */
 			continue;
 		}
-
 		*pchByte = this.pchBuffer[this.hwHead++];
-
 		if (this.hwHead >= this.hwSize) {
 			this.hwHead = 0;
 		}
-
 		this.hwLength--;
 		this.hwPeek = this.hwHead;
 		this.hwPeekLength = this.hwLength;
@@ -243,22 +234,18 @@ uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength) {
 
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	uint8_t *pchByte = pDate;
 	safe_atom_code() {
-
 		if (this.hwHead == this.hwTail &&
 		        0 == this.hwLength ) {
 			/* queue is empty */
 			hwLength = 0;
 			continue;
 		}
-
 		if (hwLength > this.hwLength) {
 			/* less data */
 			hwLength = this.hwLength;
 		}
-
 		do {
 			if (hwLength < (this.hwSize - this.hwHead)) {
 				memcpy(pchByte, &this.pchBuffer[this.hwHead], hwLength);
@@ -270,7 +257,6 @@ uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength) {
 			memcpy(&pchByte[this.hwSize - this.hwHead], &this.pchBuffer[0], hwLength - (this.hwSize - this.hwHead));
 			this.hwHead = hwLength - (this.hwSize - this.hwHead);
 		} while (0);
-
 		this.hwLength -= hwLength;
 		this.hwPeek = this.hwHead;
 		this.hwPeekLength = this.hwLength;
@@ -295,7 +281,6 @@ bool is_queue_empty(byte_queue_t *ptObj) {
 	        0 == this.hwLength ) {
 		return true;
 	}
-
 	return false;
 }
 
@@ -311,7 +296,6 @@ uint16_t get_queue_count(byte_queue_t *ptObj) {
 	assert(NULL != ptObj);
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	return (this.hwLength);
 }
 /****************************************************************************
@@ -326,7 +310,6 @@ uint16_t get_queue_available_count(byte_queue_t *ptObj) {
 	assert(NULL != ptObj);
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	return (this.hwSize - this.hwLength);
 }
 
@@ -342,7 +325,6 @@ bool is_peek_empty(byte_queue_t *ptObj) {
 	assert(NULL != ptObj);
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	if (this.hwPeek == this.hwTail &&
 	        0 == this.hwPeekLength ) {
 		return true;
@@ -368,19 +350,15 @@ bool peek_byte_queue(byte_queue_t *ptObj, uint8_t *pchByte) {
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
 	bool  bResult = false;
 	safe_atom_code() {
-
 		if (this.hwPeek == this.hwTail &&
 		        0 == this.hwPeekLength ) {
 			/* empty */
 			continue;
 		}
-
 		*pchByte = this.pchBuffer[this.hwPeek++];
-
 		if (this.hwPeek >= this.hwSize) {
 			this.hwPeek = 0;
 		}
-
 		this.hwPeekLength--;
 		bResult = true;
 	}
@@ -403,9 +381,7 @@ uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength) {
 
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	uint8_t *pchByte = pDate;
-
 	safe_atom_code() {
 		if (this.hwPeek == this.hwTail &&
 		        0 == this.hwPeekLength ) {
@@ -413,12 +389,10 @@ uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength) {
 			hwLength = 0;
 			continue;
 		}
-
 		if (hwLength > this.hwPeekLength) {
 			/* less data */
 			hwLength = this.hwPeekLength;
 		}
-
 		do {
 			if (hwLength < (this.hwSize - this.hwPeek)) {
 				memcpy(pchByte, &this.pchBuffer[this.hwPeek], hwLength);
@@ -430,7 +404,6 @@ uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength) {
 			memcpy(&pchByte[this.hwSize - this.hwPeek], &this.pchBuffer[0], hwLength - (this.hwSize - this.hwPeek));
 			this.hwPeek = hwLength - (this.hwSize - this.hwPeek);
 		} while (0);
-
 		this.hwPeekLength -= hwLength;
 	}
 	return hwLength;
@@ -448,7 +421,6 @@ bool reset_peek(byte_queue_t *ptObj) {
 	assert(NULL != ptObj);
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	safe_atom_code() {
 		this.hwPeek = this.hwHead;
 		this.hwPeekLength = this.hwLength;
@@ -468,7 +440,6 @@ bool get_all_peeked(byte_queue_t *ptObj) {
 	assert(NULL != ptObj);
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	safe_atom_code() {
 		this.hwHead = this.hwPeek;
 		this.hwLength = this.hwPeekLength;
@@ -488,9 +459,7 @@ uint16_t get_peek_status(byte_queue_t *ptObj) {
 	assert(NULL != ptObj);
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	uint16_t hwCount;
-
 	safe_atom_code() {
 		if (this.hwPeek >= this.hwHead) {
 			hwCount = this.hwPeek - this.hwHead;
@@ -514,7 +483,6 @@ bool restore_peek_status(byte_queue_t *ptObj, uint16_t hwCount) {
 	assert(NULL != ptObj);
 	/* initialise "this" (i.e. ptThis) to access class members */
 	byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-
 	safe_atom_code() {
 		if (this.hwHead + hwCount < this.hwSize) {
 			this.hwPeek = this.hwHead + hwCount;
@@ -526,5 +494,3 @@ bool restore_peek_status(byte_queue_t *ptObj, uint16_t hwCount) {
 	}
 	return true;
 }
-
-#endif
