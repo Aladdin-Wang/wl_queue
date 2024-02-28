@@ -48,10 +48,8 @@
 	                          8,7,6,5,4,3,2,1,0)
 #endif
 
-#ifndef safe_atom_code
-#include "cmsis_compiler.h"
-#define safe_atom_code()                                            \
-	#include "cmsis_compiler.h"
+#ifndef safe_atom_code                                         
+	#include "cmsis_compiler.h"                                      
     #define safe_atom_code()                                            \
     for(  uint32_t SAFE_NAME(temp) =                             \
         ({uint32_t SAFE_NAME(temp2)=__get_PRIMASK();       \
@@ -73,7 +71,6 @@
 
 
 #define __ENQUEUE_0( __QUEUE, __VALUE)                                     \
-
 ({typeof((__VALUE)) SAFE_NAME(value) = __VALUE;                     \
   enqueue_bytes((__QUEUE), &(SAFE_NAME(value)), (sizeof(__VALUE)));})
 
