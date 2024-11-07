@@ -15,7 +15,6 @@
 *                                                                           *
 ****************************************************************************/
 #include "byte_queue.h"
-#include <assert.h>
 #undef this
 #define this        (*ptThis)
 
@@ -74,53 +73,7 @@ bool reset_queue(byte_queue_t *ptObj)
     return true;
 }
 
-/****************************************************************************
-* Function: enqueue_byte                                                  *
-* Description: Enqueues a single byte into the byte queue.               *
-* Parameters:                                                             *
-*   - ptObj: Pointer to the byte_queue_t object.                         *
-*   - chByte: Byte to be enqueued.                                       *
-* Returns: True if the enqueue is successful, false otherwise.           *
-****************************************************************************/
 
-bool enqueue_byte(byte_queue_t *ptObj, uint8_t chByte)
-{
-    assert(NULL != ptObj);
-    /* initialise "this" (i.e. ptThis) to access class members */
-    byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-    bool  bResult = false;
-    safe_atom_code() {
-        if (this.hwHead == this.hwTail &&
-            0 != this.hwLength ) {
-            if (this.bIsCover == false) {
-                /* queue is full */
-                continue;
-            } else {
-                /*  overwrite */
-                this.hwHead++;
-
-                if (this.hwHead >= this.hwSize) {
-                    this.hwHead = 0;
-                }
-
-                this.hwLength--;
-                this.hwPeek = this.hwHead;
-                this.hwPeekLength = this.hwLength;
-            }
-        }
-
-        this.pchBuffer[this.hwTail++] = chByte;
-
-        if (this.hwTail >= this.hwSize) {
-            this.hwTail = 0;
-        }
-
-        this.hwLength++;
-        this.hwPeekLength++;
-        bResult = true;
-    }
-    return bResult;
-}
 
 /****************************************************************************
 * Function: enqueue_bytes                                                 *
@@ -132,112 +85,68 @@ bool enqueue_byte(byte_queue_t *ptObj, uint8_t chByte)
 * Returns: Number of bytes actually enqueued.                             *
 ****************************************************************************/
 
-uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
+uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwDataLength)
 {
-    assert(NULL != ptObj);
-    assert(NULL != pDate);
+    assert(NULL != ptObj);  // Ensure ptObj is not NULL
+    assert(NULL != pDate);  // Ensure pDate is not NULL
     /* initialise "this" (i.e. ptThis) to access class members */
-    byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-    uint8_t *pchByte = pDate;
-    safe_atom_code() {
-        if (hwLength > this.hwSize) {
-            hwLength = this.hwSize;
-        }
-
-        if (this.hwHead == this.hwTail &&
-            0 != this.hwLength ) {
-            if (this.bIsCover == false) {
-                /* queue is full */
-                hwLength = 0;
-                continue;
-            } else {
-                /* overwrite */
-                if (hwLength < (this.hwSize - this.hwHead)) {
-                    this.hwHead += hwLength;
-                } else {
-                    this.hwHead = hwLength - (this.hwSize - this.hwHead);
-                }
-
-                this.hwLength -= hwLength;
-                this.hwPeek = this.hwHead;
-                this.hwPeekLength = this.hwLength;
+    byte_queue_t *ptThis = (byte_queue_t *)ptObj;	
+    bool bEarlyReturn = false;  // Initialize early return flag
+    safe_atom_code() {  // Start atomic section for thread safety
+        if(this.hwHead == this.hwTail && 0 != this.hwLength) {  // Check if queue is full
+            if(this.bIsCover == false) {  // If not allowed to overwrite
+                bEarlyReturn = true;							
+                continue;  // Exit atomic block
             }
-        }
-
-        if (hwLength > (this.hwSize - this.hwLength)) {
-            if (this.bIsCover == false) {
-                /* drop some data */
-                hwLength = this.hwSize - this.hwLength;
-            } else {
-                /* overwrite some data */
-                uint16_t hwOverLength = hwLength - ((this.hwSize - this.hwLength));
-
-                if (hwOverLength < (this.hwSize - this.hwHead)) {
-                    this.hwHead += hwOverLength;
-                } else {
-                    this.hwHead = hwLength - (this.hwSize - this.hwHead);
-                }
-
-                this.hwLength -= hwOverLength;
-                this.hwPeek = this.hwHead;
-                this.hwPeekLength = this.hwLength;
-            }
-        }
-
-        do {
-            if (hwLength < (this.hwSize - this.hwTail)) {
-                memcpy(&this.pchBuffer[this.hwTail], pchByte, hwLength);
-                this.hwTail += hwLength;
-                break;
-            }
-
-            memcpy(&this.pchBuffer[this.hwTail], &pchByte[0], this.hwSize - this.hwTail);
-            memcpy(&this.pchBuffer[0], &pchByte[this.hwSize - this.hwTail], hwLength - (this.hwSize - this.hwTail));
-            this.hwTail = hwLength - (this.hwSize - this.hwTail);
-        } while (0);
-
-        this.hwLength += hwLength;
-        this.hwPeekLength += hwLength;
+        }			
+        if(!this.bMutex) {  // Check if mutex is free
+            this.bMutex  = true;  // Lock the queue for thread safety
+        } else {
+            bEarlyReturn = true;  // Another thread is modifying the queue
+        }					
     }
-    return hwLength;
+    if(bEarlyReturn) {
+        return 0;  // Return 0 if queue is full or accessed by another thread
+    }		
+    uint8_t *pchByte = pDate;  // Cast data pointer to byte pointer
+    uint16_t hwTail = this.hwTail;  // Store current tail index
+    safe_atom_code() {  // Start atomic section for thread safety
+        if(hwDataLength > this.hwSize) {  // If data length exceeds queue size
+            hwDataLength = this.hwSize;  // Limit data length to queue size
+        }			
+        if(hwDataLength > (this.hwSize - this.hwLength)) {  // If not enough space
+            if(this.bIsCover == false) {  // If not allowed to overwrite
+                hwDataLength = this.hwSize - this.hwLength;  // Adjust data length
+            } else {  // If overwriting is allowed
+                uint16_t hwOverLength = hwDataLength - (this.hwSize - this.hwLength);  // Calculate overwrite length
+                if(hwOverLength < (this.hwSize - this.hwHead)) {
+                    this.hwHead += hwOverLength;  // Move head forward
+                } else {
+                    this.hwHead = hwDataLength - (this.hwSize - this.hwHead);  // Wrap around
+                } 
+                this.hwLength -= hwOverLength;  // Decrease length
+                this.hwPeek = this.hwHead;  // Update peek index
+                this.hwPeekLength = this.hwLength;  // Update peek length
+            }
+        }
+        if(hwDataLength < (this.hwSize - this.hwTail)) {
+            this.hwTail += hwDataLength;  // Move tail forward
+        } else {
+            this.hwTail = hwDataLength - (this.hwSize - this.hwTail);  // Wrap around
+        }
+        this.hwLength += hwDataLength;  // Increase queue length
+        this.hwPeekLength += hwDataLength;  // Increase peek length
+    } 
+    if(hwDataLength <= (this.hwSize - hwTail)) {
+        memcpy(&this.pchBuffer[hwTail], pchByte, hwDataLength);  // Copy data to buffer
+    } else {
+        memcpy(&this.pchBuffer[hwTail], &pchByte[0], this.hwSize - hwTail);  // Copy first part
+        memcpy(&this.pchBuffer[0], &pchByte[this.hwSize - hwTail], hwDataLength - (this.hwSize - hwTail));  // Copy second part
+    }
+    this.bMutex = false;  // Unlock the queue
+    return hwDataLength;  // Return number of bytes enqueued
 }
 
-/****************************************************************************
-* Function: dequeue_byte                                                  *
-* Description: Dequeues a single byte from the byte queue.               *
-* Parameters:                                                             *
-*   - ptObj: Pointer to the byte_queue_t object.                         *
-*   - pchByte: Pointer to store the dequeued byte.                       *
-* Returns: True if the dequeue is successful, false otherwise.           *
-****************************************************************************/
-
-bool dequeue_byte(byte_queue_t *ptObj, uint8_t *pchByte)
-{
-    assert(NULL != ptObj);
-    assert(NULL != pchByte);
-    /* initialise "this" (i.e. ptThis) to access class members */
-    byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-    bool  bResult = false;
-    safe_atom_code() {
-        if (this.hwHead == this.hwTail &&
-            0 == this.hwLength ) {
-            /* queue is empty */
-            continue;
-        }
-
-        *pchByte = this.pchBuffer[this.hwHead++];
-
-        if (this.hwHead >= this.hwSize) {
-            this.hwHead = 0;
-        }
-
-        this.hwLength--;
-        this.hwPeek = this.hwHead;
-        this.hwPeekLength = this.hwLength;
-        bResult = true;
-    }
-    return bResult;
-}
 
 /****************************************************************************
 * Function: dequeue_bytes                                                 *
@@ -249,44 +158,51 @@ bool dequeue_byte(byte_queue_t *ptObj, uint8_t *pchByte)
 * Returns: Number of bytes actually dequeued.                             *
 ****************************************************************************/
 
-uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
+uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwDataLength)
 {
-    assert(NULL != ptObj);
-    assert(NULL != pDate);
+    assert(NULL != ptObj);  // Ensure ptObj is not NULL
+    assert(NULL != pDate);  // Ensure pDate is not NULL
 
     /* initialise "this" (i.e. ptThis) to access class members */
     byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-    uint8_t *pchByte = pDate;
-    safe_atom_code() {
-        if (this.hwHead == this.hwTail &&
-            0 == this.hwLength ) {
-            /* queue is empty */
-            hwLength = 0;
-            continue;
-        }
-
-        if (hwLength > this.hwLength) {
-            /* less data */
-            hwLength = this.hwLength;
-        }
-
-        do {
-            if (hwLength < (this.hwSize - this.hwHead)) {
-                memcpy(pchByte, &this.pchBuffer[this.hwHead], hwLength);
-                this.hwHead += hwLength;
-                break;
-            }
-
-            memcpy(&pchByte[0], &this.pchBuffer[this.hwHead], this.hwSize - this.hwHead);
-            memcpy(&pchByte[this.hwSize - this.hwHead], &this.pchBuffer[0], hwLength - (this.hwSize - this.hwHead));
-            this.hwHead = hwLength - (this.hwSize - this.hwHead);
-        } while (0);
-
-        this.hwLength -= hwLength;
-        this.hwPeek = this.hwHead;
-        this.hwPeekLength = this.hwLength;
+    bool bEarlyReturn = false;  // Initialize early return flag
+    safe_atom_code() {  // Start atomic section for thread safety
+        if(this.hwHead == this.hwTail && 0 == this.hwLength) {  // Check if queue is empty
+            bEarlyReturn = true;  // Set early return flag
+            continue;  // Exit atomic block
+        }			
+        if(!this.bMutex) {  // Check if mutex is free
+            this.bMutex  = true;  // Lock the queue for thread safety
+        } else {
+            bEarlyReturn = true;  // Another thread is modifying the queue
+        }					
     }
-    return hwLength;
+    if(bEarlyReturn) {
+        return 0;  // Return 0 if queue is empty or accessed by another thread
+    }	
+    uint8_t *pchByte = pDate;  // Cast data pointer to byte pointer
+    uint16_t hwHead = this.hwHead;  // Store current head index
+    safe_atom_code() {  // Start atomic section for thread safety
+        if(hwDataLength > this.hwLength) {  // If requested length exceeds available data
+            hwDataLength = this.hwLength;  // Adjust data length
+        }			
+        if(hwDataLength < (this.hwSize - this.hwHead)) {
+            this.hwHead += hwDataLength;  // Move head forward
+        } else {
+            this.hwHead = hwDataLength - (this.hwSize - this.hwHead);  // Wrap around
+        }					
+        this.hwLength -= hwDataLength;  // Decrease queue length
+        this.hwPeek = this.hwHead;  // Update peek index
+        this.hwPeekLength = this.hwLength;  // Update peek length
+    }	
+    if(hwDataLength <= (this.hwSize - hwHead)) {
+        memcpy(pchByte, &this.pchBuffer[hwHead], hwDataLength);  // Copy data from buffer
+    } else {
+        memcpy(&pchByte[0], &this.pchBuffer[hwHead], this.hwSize - hwHead);  // Copy first part
+        memcpy(&pchByte[this.hwSize - hwHead], &this.pchBuffer[0], hwDataLength - (this.hwSize - hwHead));  // Copy second part
+    }			
+    this.bMutex = false;  // Unlock the queue
+    return hwDataLength;  // Return number of bytes dequeued
 }
 
 /****************************************************************************
@@ -364,41 +280,6 @@ bool is_peek_empty(byte_queue_t *ptObj)
     return false;
 }
 
-/****************************************************************************
-* Function: peek_byte_queue                                               *
-* Description: Peeks a single byte from the byte queue without dequeuing. *
-* Parameters:                                                             *
-*   - ptObj: Pointer to the byte_queue_t object.                         *
-*   - pchByte: Pointer to store the peeked byte.                         *
-* Returns: True if peek is successful, false otherwise.                  *
-****************************************************************************/
-
-bool peek_byte_queue(byte_queue_t *ptObj, uint8_t *pchByte)
-{
-    assert(NULL != ptObj);
-    assert(NULL != pchByte);
-
-    /* initialise "this" (i.e. ptThis) to access class members */
-    byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-    bool  bResult = false;
-    safe_atom_code() {
-        if (this.hwPeek == this.hwTail &&
-            0 == this.hwPeekLength ) {
-            /* empty */
-            continue;
-        }
-
-        *pchByte = this.pchBuffer[this.hwPeek++];
-
-        if (this.hwPeek >= this.hwSize) {
-            this.hwPeek = 0;
-        }
-
-        this.hwPeekLength--;
-        bResult = true;
-    }
-    return bResult;
-}
 
 /****************************************************************************
 * Function: peek_bytes_queue                                              *
@@ -410,42 +291,50 @@ bool peek_byte_queue(byte_queue_t *ptObj, uint8_t *pchByte)
 * Returns: Number of bytes actually peeked.                               *
 ****************************************************************************/
 
-uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength)
+uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwDataLength)
 {
-    assert(NULL != ptObj);
-    assert(NULL != pDate);
+    assert(NULL != ptObj);  // Ensure ptObj is not NULL
+    assert(NULL != pDate);  // Ensure pDate is not NULL
 
     /* initialise "this" (i.e. ptThis) to access class members */
     byte_queue_t *ptThis = (byte_queue_t *)ptObj;
-    uint8_t *pchByte = pDate;
-    safe_atom_code() {
-        if (this.hwPeek == this.hwTail &&
-            0 == this.hwPeekLength ) {
-            /* empty */
-            hwLength = 0;
-            continue;
-        }
-
-        if (hwLength > this.hwPeekLength) {
-            /* less data */
-            hwLength = this.hwPeekLength;
-        }
-
-        do {
-            if (hwLength < (this.hwSize - this.hwPeek)) {
-                memcpy(pchByte, &this.pchBuffer[this.hwPeek], hwLength);
-                this.hwPeek += hwLength;
-                break;
-            }
-
-            memcpy(&pchByte[0], &this.pchBuffer[this.hwPeek], this.hwSize - this.hwPeek);
-            memcpy(&pchByte[this.hwSize - this.hwPeek], &this.pchBuffer[0], hwLength - (this.hwSize - this.hwPeek));
-            this.hwPeek = hwLength - (this.hwSize - this.hwPeek);
-        } while (0);
-
-        this.hwPeekLength -= hwLength;
+		
+    bool bEarlyReturn = false;  // Initialize early return flag
+    safe_atom_code() {  // Start atomic section for thread safety
+        if(this.hwPeek == this.hwTail && 0 == this.hwPeekLength) {  // Check if peek buffer is empty
+            bEarlyReturn = true;  // Set early return flag
+            continue;  // Exit atomic block
+        }			
+        if(!this.bMutex) {  // Check if mutex is free
+            this.bMutex  = true;  // Lock the queue for thread safety
+        } else {
+            bEarlyReturn = true;  // Another thread is modifying the queue
+        }					
     }
-    return hwLength;
+    if(bEarlyReturn) {
+        return 0;  // Return 0 if peek buffer is empty or accessed by another thread
+    }
+    uint8_t *pchByte = pDate;  // Cast data pointer to byte pointer
+    uint16_t hwPeek = this.hwPeek;  // Store current peek index
+    safe_atom_code() {  // Start atomic section for thread safety
+        if(hwDataLength > this.hwPeekLength) {  // If requested length exceeds available data
+            hwDataLength = this.hwPeekLength;  // Adjust data length
+        }			
+        if(hwDataLength < (this.hwSize - this.hwPeek)) {
+            this.hwPeek += hwDataLength;  // Move peek index forward
+        } else {
+            this.hwPeek = hwDataLength - (this.hwSize - this.hwPeek);  // Wrap around
+        }
+        this.hwPeekLength -= hwDataLength;  // Decrease peek length
+    }
+    if(hwDataLength <= (this.hwSize - hwPeek)) {
+        memcpy(pchByte, &this.pchBuffer[hwPeek], hwDataLength);  // Copy data from buffer
+    } else {
+        memcpy(&pchByte[0], &this.pchBuffer[hwPeek], this.hwSize - hwPeek);  // Copy first part
+        memcpy(&pchByte[this.hwSize - hwPeek], &this.pchBuffer[0], hwDataLength - (this.hwSize - hwPeek));  // Copy second part
+    }
+    this.bMutex = false;  // Unlock the queue
+    return hwDataLength;  // Return number of bytes peeked
 }
 
 /****************************************************************************

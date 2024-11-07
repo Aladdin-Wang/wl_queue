@@ -17,7 +17,7 @@
 
 #ifndef QUEUE_QUEUE_H_
 #define QUEUE_QUEUE_H_
-
+#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
@@ -224,6 +224,16 @@
     CONNECT2(__PEEK_QUEUE_,__PLOOC_VA_NUM_ARGS(__VA_ARGS__))        \
     (__QUEUE,(__ADDR),##__VA_ARGS__)
 
+#ifdef assert
+#undef assert
+#endif
+#define assert(EXPR)                                                           \
+if (!(EXPR))                                                                   \
+{                                                                              \
+    printf("(%s) has assert failed at %s.\n", #EXPR, __FUNCTION__);        \
+    while (1);                                                                 \
+}
+
 typedef struct byte_queue_t {
     uint8_t *pchBuffer;
     uint16_t hwSize;
@@ -232,6 +242,7 @@ typedef struct byte_queue_t {
     uint16_t hwLength;
     uint16_t hwPeek;
     uint16_t hwPeekLength;
+	bool bMutex;
     bool bIsCover;
 } byte_queue_t;
 
@@ -242,16 +253,10 @@ extern
 bool reset_queue(byte_queue_t *ptObj);
 
 extern
-bool enqueue_byte(byte_queue_t *ptQueue, uint8_t chByte);
+uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwDataLength);
 
 extern
-uint16_t enqueue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength);
-
-extern
-bool dequeue_byte(byte_queue_t *ptQueue, uint8_t *pchByte);
-
-extern
-uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwLength);
+uint16_t dequeue_bytes(byte_queue_t *ptObj, void *pDate, uint16_t hwDataLength);
 
 extern
 bool is_queue_empty(byte_queue_t *ptQueue);
@@ -260,10 +265,7 @@ extern
 bool is_peek_empty(byte_queue_t *ptObj);
 
 extern
-bool peek_byte_queue(byte_queue_t *ptQueue, uint8_t *pchByte);
-
-extern
-uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwLength);
+uint16_t peek_bytes_queue(byte_queue_t *ptObj, void *pDate, uint16_t hwDataLength);
 
 extern
 bool reset_peek(byte_queue_t *ptQueue);
