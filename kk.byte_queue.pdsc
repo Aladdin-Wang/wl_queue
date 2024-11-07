@@ -19,6 +19,9 @@
       Active development ...
     </release>
     <!-- automatically generated content, please do not modify -->
+	<release date="2024-11-07" version="1.0.3" tag="1.0.3" >
+      Delete PLOOC.
+    </release>		
 	<release date="2024-02-28" version="1.0.2" tag="1.0.2" >
       Delete PLOOC.
     </release>	
@@ -39,7 +42,7 @@
 	
   <components>
     <!-- byte_queue 组件 -->
-    <component Cclass="Generic" Cversion="1.0.2" Cgroup="byte_queue">
+    <component Cclass="Generic" Cversion="1.0.3" Cgroup="byte_queue">
       <description>A circular queue library written in C that supports arbitrary types.</description>
       <files>
         <file category="header" name="byte_queue.h"/>
